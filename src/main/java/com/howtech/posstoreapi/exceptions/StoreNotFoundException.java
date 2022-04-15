@@ -5,13 +5,13 @@ package com.howtech.posstoreapi.exceptions;
  * @author Damond Howard
  * @apiNote exception to be thrown when a store does not exist in the database
  */
-public class StoreNotFoundException extends Exception {
+public class StoreNotFoundException extends RuntimeException {
 
 	/**
 	 * ,
 	 */
 	private static final long serialVersionUID = -7003823387013017735L;
-	private String ERROR_MESSAGE;
+	private final String ERROR_MESSAGE;
 
 	/**
 	 * 
@@ -26,7 +26,7 @@ public class StoreNotFoundException extends Exception {
 	}
 
 	@Override
-	/**
+	/*
 	 * returns the error message
 	 */
 	public String toString() {

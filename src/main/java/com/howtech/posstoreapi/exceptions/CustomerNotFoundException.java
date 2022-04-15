@@ -5,13 +5,13 @@ package com.howtech.posstoreapi.exceptions;
  * @author Damond Howard
  * @apiNote Exception to be thrown when a customer is not found in the database
  */
-public class CustomerNotFoundException extends Exception {
+public class CustomerNotFoundException extends RuntimeException {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 6711406069444923545L;
-	private String ERROR_MESSAGE;
+	private final String ERROR_MESSAGE;
 
 	/**
 	 * 

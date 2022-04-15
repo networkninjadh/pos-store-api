@@ -60,7 +60,6 @@ public class StoreService {
 	private final CustomerService customerService;
 	private final ValidateMembershipService validateMembershipService;
 	private final PaymentService paymentService;
-
 	private final StorageService storageService;
 
 	public StoreService(StoreRepository storeRepository,
@@ -189,9 +188,8 @@ public class StoreService {
 	public List<Store> getByOwnerName(UserInfo userInfo) {
 		List<Store> stores = storeRepository.findAll();
 		Predicate<Store> byOwner = store -> store.getOwnerName().equals(userInfo.getUsername());
-		List<Store> myStores = stores.stream().filter(byOwner)
+		return stores.stream().filter(byOwner)
 				.collect(Collectors.toList());
-		return myStores;
 	}
 
 	public Store getById(Long storeId) throws StoreNotFoundException {
@@ -239,8 +237,8 @@ public class StoreService {
 		Predicate<Store> byOwner = store -> store.getOwnerName().equals(userInfo.getUsername());
 		List<Store> myStores = stores.stream().filter(byOwner).collect(Collectors.toList());
 		Set<Employee> myEmployees = new HashSet<>();
-		myStores.stream().forEach(store -> {
-			store.getEmployees().stream().forEach(ele -> {
+		myStores.forEach(store -> {
+			store.getEmployees().forEach(ele -> {
 				System.out.println(ele.getEmployeeId());
 				myEmployees.add(ele);
 			});
@@ -279,8 +277,7 @@ public class StoreService {
 		Predicate<Store> byOwner = store -> store.getOwnerName().equals(userInfo.getUsername());
 		Set<Store> myStores = stores.stream().filter(byOwner).collect(Collectors.toSet());
 		// TODO get all customers from all stores
-		Set<CustomerDto> myCustomers = new HashSet<>();
-		return myCustomers;// TODO: finish
+		return new HashSet<>();// TODO: finish
 		// doesn't need to be done yet do this after the customer side is done
 		// use customer to store dto
 		// use the customer id in the order
@@ -293,9 +290,9 @@ public class StoreService {
 				.orElseThrow(() -> new StoreNotFoundException(refererId));
 		if (myStore.getOwnerName().equals(userInfo.getUsername())) {
 			// check to see if the other store has finished signing up first
-			Store referedStore = storeRepository.findById(referedId)
+			Store referredStore = storeRepository.findById(referedId)
 					.orElseThrow(() -> new StoreNotFoundException(referedId));
-			if (referedStore.getMembershipType() != null) {
+			if (referredStore.getMembershipType() != null) {
 				myStore.addReferal(); // can be modified later to keep track of the store that was refered
 				storeRepository.save(myStore);
 			}
@@ -388,7 +385,7 @@ public class StoreService {
 		// charge the customer
 	}
 
-	public StoreOrder orderFrom(Long storeId, Long customerId, StoreOrder order)
+	public StoreOrder orderFrom(Long storeId, Long customerId, StoreOrder order, UserInfo userInfo)
 			throws CustomerNotFoundException, StoreNotFoundException, QueueFullException {
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
@@ -525,7 +522,6 @@ public class StoreService {
 
 		myStore
 				.getStoreInventory()
-				.stream()
 				.forEach((inventoryItem) -> {
 					if (inventoryItem.getProductId().equals(inventoryId)) {
 						inventoryItem.setDescriptions(product.getDescriptions());
@@ -563,7 +559,6 @@ public class StoreService {
 
 		myStore
 				.getStoreInventory()
-				.stream()
 				.forEach((inventoryItem) -> {
 					if (inventoryItem.getProductId().equals(inventoryId)) {
 						myStore.getStoreInventory().remove(inventoryItem);
@@ -583,7 +578,7 @@ public class StoreService {
 
 	/*
 	 * public RedirectView connectToPaypal(Long storeId, HttpSession session,
-	 * UserInfo userInfo)
+	 * UserInfo)
 	 * throws StoreNotFoundException, PayPalRESTException {
 	 * Store myStore = storeRepository.findById(storeId)
 	 * .orElseThrow(() -> new StoreNotFoundException(storeId));

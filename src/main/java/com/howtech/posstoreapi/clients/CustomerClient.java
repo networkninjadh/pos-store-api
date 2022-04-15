@@ -11,10 +11,11 @@ public class CustomerClient {
 
     private RestTemplate restTemplate;
 
-    private String URL = "http://localhost:8082";
-    private String CUSTOMER = "/customer-api/customer/";
-
+    String URL = "http://localhost:8082";
+    
     public CustomerDto getById(Long customerId) {
+
+        String CUSTOMER = "/customer-api/customer/";
         ResponseEntity<CustomerDto> response = restTemplate
                 .getForEntity(URL + CUSTOMER + customerId, CustomerDto.class);
         return response.getBody();

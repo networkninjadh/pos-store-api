@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class BronzeMembershipType {
 	private final int freeDeliveriesPerMonth = 25;
 	private final double transactionFee = .10;
-	private final double cashBackReferal = 100.00;
+	private final double cashBackReferral = 100.00;
 	private final double onboardingFee = 100.00;
 	private final double monthlyCost = 500.00;
 	private final double sixMonthCost = 2500.00;

@@ -18,6 +18,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StoreRepository extends JpaRepository<Store, Long> {
-	Optional<List<Store>> findByOwnerName(String ownerName);
 
+	Optional<List<Store>> findByOwnerName(String ownerName);
 }

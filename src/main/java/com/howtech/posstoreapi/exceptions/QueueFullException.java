@@ -8,9 +8,9 @@ package com.howtech.posstoreapi.exceptions;
  *          orders in queue
  *
  */
-public class QueueFullException extends Exception {
+public class QueueFullException extends RuntimeException {
 
-	private String ERROR_MESSAGE;
+	private final String ERROR_MESSAGE;
 
 	public QueueFullException(Long storeId) {
 		this.ERROR_MESSAGE = "Sorry but the store with id = " + storeId + " is at maximum for orders";
