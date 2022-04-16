@@ -19,7 +19,6 @@ import java.util.Objects;
 @ToString
 @RequiredArgsConstructor
 @Entity
-@NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "customer_orders")
 public class CustomerOrder {
