@@ -9,8 +9,11 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class CustomerClient {
 
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
+    public CustomerClient(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
     String URL = "http://localhost:8082";
     
     public CustomerDto getById(Long customerId) {
