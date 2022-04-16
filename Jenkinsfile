@@ -10,16 +10,20 @@ pipeline {
     stages {
 
         stage('Initialize') {
-            echo "PATH = ${PATH}"
-            echo "M2_HOME = ${M2_HOME}"
+            steps {
+                echo "PATH = ${PATH}"
+                echo "M2_HOME = ${M2_HOME}"
+            }
+
         }
 
         stage('Build') {
-            echo "Build Stage"
+            steps {
+                echo "Build Stage"
+            }
         }
 
         stage('Test') {
-            echo "Test Stage"
         }
 
         stage('package') {
