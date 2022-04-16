@@ -7,7 +7,6 @@ pipeline {
         stage('Initialize') {
             steps {
                 echo "PATH = ${PATH}"
-                sudo sh pwd
             }
 
         }
@@ -15,6 +14,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo "Build Stage"
+                sh 'mvn -Dmaven.test.failure.ignore=true install'
             }
         }
 
