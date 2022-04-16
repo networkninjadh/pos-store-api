@@ -7,7 +7,7 @@ pipeline {
         stage('Initialize') {
             steps {
                 echo "PATH = ${PATH}"
-                pwd
+                sh pwd
             }
 
         }
