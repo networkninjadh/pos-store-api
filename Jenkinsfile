@@ -23,11 +23,13 @@ pipeline {
             }
         }
 
+        /*
         stage('Test') {
         }
 
         stage('package') {
 
         }
+        */
     }
 }
