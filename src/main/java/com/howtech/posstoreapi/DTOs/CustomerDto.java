@@ -11,6 +11,7 @@ import lombok.Data;
 @Data
 public class CustomerDto {
 
+    private Long customerId;
     private String username;
     private String firstName;
     private String lastName;
