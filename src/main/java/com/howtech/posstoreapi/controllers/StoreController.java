@@ -1,6 +1,7 @@
 package com.howtech.posstoreapi.controllers;
 
 import java.util.List;
+import java.util.Map;
 
 import com.howtech.posstoreapi.DTOs.HoursDto;
 import com.howtech.posstoreapi.DTOs.StoreDto;
@@ -12,13 +13,7 @@ import com.howtech.posstoreapi.services.StoreService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 
@@ -60,9 +55,9 @@ public class StoreController {
 	 * @throws Exception
 	 */
 	@PostMapping("/store/new")
-	public Store addStore(@RequestBody StoreDto store, UserInfo userInfo) {
-		LOGGER.info("Creating a new Store");
-		return storeService.createFromDto(store, userInfo);
+	public Store addStore(@RequestBody StoreDto store, @RequestHeader(name = "user-token", required = true) String username) {
+		LOGGER.info("Creating a new Store for user " + username);
+		return storeService.createFromDto(store, username);
 	}
 
 	/**
@@ -128,8 +123,8 @@ public class StoreController {
 	 * @return the store based off the provided id
 	 * @throws StoreNotFoundException
 	 */
-	@GetMapping("/store/{storeId}")
-	public Store getStore(@PathVariable Long storeId) throws StoreNotFoundException {
+	@GetMapping("/store/{store_id}")
+	public Store getStore(@PathVariable(name = "store_id") Long storeId) throws StoreNotFoundException {
 		return storeService.getById(storeId);
 	}
 

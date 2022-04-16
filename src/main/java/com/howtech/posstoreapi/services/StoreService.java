@@ -74,11 +74,11 @@ public class StoreService {
 		this.storageService = storageService;
 	}
 
-	public Store createFromDto(StoreDto store, UserInfo userInfo) {
+	public Store createFromDto(StoreDto store, String username) {
 
 		LOGGER.info("Creating new Store");
 		Store myStore = new Store();
-		myStore.getOwners().add(userInfo.getUsername());
+		myStore.getOwners().add(username);
 		myStore.setStoreName(store.getStoreName());
 		myStore.setAccountManager(store.getAccountManager());
 		myStore.setCellPhoneNumber(store.getCellphone());
@@ -110,8 +110,8 @@ public class StoreService {
 		AccountInfo accountInfo = new AccountInfo();
 		accountInfo.setAccountAddressInfo(accountAddress);
 		myStore.setAccountInfo(accountInfo);
-		myStore.setOwnerName(userInfo.getUsername());
-
+		//myStore.setOwnerName(userInfo.getUsername());
+		myStore.setOwnerName(username);
 		LOGGER.info("Validating membership code");
 		if (store.getMembershipType().equals(MembershipType.BRONZE)) {
 			if (validateMembershipService.verifyMembershipBronze(store.getMembershipCode())) {
@@ -264,10 +264,8 @@ public class StoreService {
 		Predicate<Store> byOwner = store -> store.getOwnerName().equals(userInfo.getUsername());
 		List<Store> myStores = stores.stream().filter(byOwner).collect(Collectors.toList());
 		Set<StoreOrder> orders = new HashSet<>();
-		myStores.stream().forEach(store -> {
-			store.getStoreOrders().stream().forEach(ele -> {
-				orders.add(ele);
-			});
+		myStores.forEach(store -> {
+			orders.addAll(store.getStoreOrders());
 		});
 		return orders;
 	}
@@ -299,7 +297,7 @@ public class StoreService {
 		} else {
 			throw new AccessDeniedException("You don't own this store so you cannot refer another store");
 		}
-		return "Congradulations " + userInfo.getUsername() + " you have successfully refered store " + referedId;
+		return "Congratulations " + userInfo.getUsername() + " you have successfully referred store " + referedId;
 	}
 
 	public String openStore(Long storeId, UserInfo userInfo, Employee employee) throws StoreNotFoundException {
@@ -320,7 +318,7 @@ public class StoreService {
 		} else {
 			throw new AccessDeniedException("You don't own this store so you don't have permission to open it");
 		}
-		return "Congragulations " + userInfo.getUsername() + " your store is now open for business!!!";
+		return "Congratulations " + userInfo.getUsername() + " your store is now open for business!!!";
 	}
 
 	public String closeStore(Long storeId, UserInfo userInfo) throws StoreNotFoundException {
@@ -333,7 +331,7 @@ public class StoreService {
 		} else {
 			throw new AccessDeniedException("You don't own this store so you don't have permissions to access it");
 		}
-		return "Congragulations " + userInfo.getUsername() + " your store is now open for business!!!";
+		return "Congratulations " + userInfo.getUsername() + " your store is now open for business!!!";
 	}
 
 	public Set<StoreOrder> getOrdersByStore(Long storeId, UserInfo userInfo) throws StoreNotFoundException {
@@ -434,7 +432,7 @@ public class StoreService {
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
 		Set<Employee> employees = myStore.getEmployees();
-		employees.stream()
+		employees
 				.forEach((employee) -> {
 					if (employee.getEmployeeId().equals(employeeId)) {
 						employee.setCode(newEmployeeData.getCode());
@@ -452,15 +450,14 @@ public class StoreService {
 	public Set<Employee> getEmployees(Long storeId, UserInfo userInfo) throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
-		Set<Employee> employees = myStore.getEmployees();
-		return employees;
+		return myStore.getEmployees();
 	}
 
 	public Store deleteEmployee(Long storeId, Long employeeId, UserInfo userInfo) throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
 		Set<Employee> employees = myStore.getEmployees();
-		employees.stream()
+		employees
 				.forEach((employee) -> {
 					if (employee.getEmployeeId().equals(employeeId)) {
 						employees.remove(employee);
@@ -508,8 +505,7 @@ public class StoreService {
 		}
 		Set<Product> inventoryItems = myStore.getStoreInventory();
 		Predicate<Product> byId = inventoryItem -> inventoryItem.getProductId().equals(inventoryId);
-		Product product = inventoryItems.stream().filter(byId).collect(Collectors.toSet()).iterator().next();
-		return product;
+		return inventoryItems.stream().filter(byId).collect(Collectors.toSet()).iterator().next();
 	}
 
 	public Store changeInventoryItem(Long storeId, Long inventoryId, Product product, UserInfo userInfo)
