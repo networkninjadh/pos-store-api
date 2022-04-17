@@ -96,7 +96,7 @@ public class StoreService {
 		address.setStreet(store.getStore_address_street());
 		myStore.setAddress(address);
 		// set the address of the owner
-		LOGGER.info("Setting Busuiness and Account info");
+		LOGGER.info("Setting Business and Account info");
 		AccountAddressInfo accountAddress = new AccountAddressInfo();
 		BusinessInfo businessInfo = new BusinessInfo();
 		businessInfo.setEIN(store.getBusiness_ein());
