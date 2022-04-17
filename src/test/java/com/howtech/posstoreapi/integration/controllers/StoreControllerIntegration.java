@@ -43,6 +43,8 @@ class StoreControllerIntegration {
 
     private final String URL;
 
+    Store myStore;
+
     public StoreControllerIntegration() {
 
         restTemplate = new TestRestTemplate();
@@ -102,8 +104,6 @@ class StoreControllerIntegration {
                 .postForEntity(URL + ADD_STORE, request, Store.class);
         //TODO assert the Response
         LOGGER.info("PosStoreApiApplicationTests: Created a new Store");
-
-        Store myStore;
 
         MembershipType myMembershipType = MembershipType.BRONZE;
         ChargeFrequency whenToCharge = ChargeFrequency.MONTHLY;

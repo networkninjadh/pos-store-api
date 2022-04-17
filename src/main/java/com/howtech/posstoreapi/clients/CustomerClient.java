@@ -11,17 +11,29 @@ public class CustomerClient {
 
     private final RestTemplate restTemplate;
 
+    String URL = "http://localhost:8082";
+
     public CustomerClient(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
-    String URL = "http://localhost:8082";
-    
+
     public CustomerDto getById(Long customerId) {
 
         String CUSTOMER = "/customer-api/customer/";
+
         ResponseEntity<CustomerDto> response = restTemplate
                 .getForEntity(URL + CUSTOMER + customerId, CustomerDto.class);
+
         return response.getBody();
     }
 
+    public CustomerDto[] getAllCustomers() {
+
+        String CUSTOMERS = "/customer-api/customers";
+
+        ResponseEntity<CustomerDto[]> response = restTemplate
+                .getForEntity(URL, CustomerDto[].class);
+
+        return response.getBody();
+    }
 }

@@ -251,10 +251,8 @@ public class StoreService {
 		Predicate<Store> byOwner = store -> store.getOwnerName().equals(userInfo.getUsername());
 		List<Store> myStores = stores.stream().filter(byOwner).collect(Collectors.toList());
 		Set<Product> myInventory = new HashSet<>();
-		myStores.stream().forEach(store -> {
-			store.getStoreInventory().stream().forEach(ele -> {
-				myInventory.add(ele);
-			});
+		myStores.parallelStream().forEach(store -> {
+			store.getStoreInventory().parallelStream().forEach(myInventory::add);
 		});
 		return myInventory;
 	}
@@ -283,21 +281,21 @@ public class StoreService {
 		// build the dto objects based off customer
 	}
 
-	public String referAStore(Long refererId, Long referedId, UserInfo userInfo) throws StoreNotFoundException {
+	public String referAStore(Long refererId, Long referredId, UserInfo userInfo) throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(refererId)
 				.orElseThrow(() -> new StoreNotFoundException(refererId));
 		if (myStore.getOwnerName().equals(userInfo.getUsername())) {
 			// check to see if the other store has finished signing up first
-			Store referredStore = storeRepository.findById(referedId)
-					.orElseThrow(() -> new StoreNotFoundException(referedId));
+			Store referredStore = storeRepository.findById(referredId)
+					.orElseThrow(() -> new StoreNotFoundException(referredId));
 			if (referredStore.getMembershipType() != null) {
-				myStore.addReferal(); // can be modified later to keep track of the store that was refered
+				myStore.addReferal(); // can be modified later to keep track of the store that was referred
 				storeRepository.save(myStore);
 			}
 		} else {
 			throw new AccessDeniedException("You don't own this store so you cannot refer another store");
 		}
-		return "Congratulations " + userInfo.getUsername() + " you have successfully referred store " + referedId;
+		return "Congratulations " + userInfo.getUsername() + " you have successfully referred store " + referredId;
 	}
 
 	public String openStore(Long storeId, UserInfo userInfo, Employee employee) throws StoreNotFoundException {
