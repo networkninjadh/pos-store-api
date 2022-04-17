@@ -31,7 +31,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 /**
  * @author Damond Howard
  */
-@SpringBootTest(classes = PosStoreApiApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = StoreControllerIntegration.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class StoreControllerIntegration {
 
     private final Logger LOGGER = LoggerFactory.getLogger(StoreControllerIntegration.class);
@@ -46,7 +46,9 @@ class StoreControllerIntegration {
     public StoreControllerIntegration() {
 
         restTemplate = new TestRestTemplate();
+
         URL = "http://localhost:" + port + "/store-api";
+
         headers.add("Content-Type", "application/json");
         headers.add("user-token", "networkninjadh");
         headers.add("Authorization", "Basic YWRtaW46cGFzcw==");
@@ -80,7 +82,6 @@ class StoreControllerIntegration {
         storeDtoJsonObject.put("ownerLastname", "Howard");
         storeDtoJsonObject.put("owner_address_city", "Baton Rouge");
         storeDtoJsonObject.put("owner_address_country", "United States");
-
         storeDtoJsonObject.put("owner_address_postcode", "70808");
         storeDtoJsonObject.put("owner_address_province", "LA");
         storeDtoJsonObject.put("owner_address_street", "1111 Nowhere Dr");
@@ -99,7 +100,7 @@ class StoreControllerIntegration {
 
         ResponseEntity<Store> response = restTemplate
                 .postForEntity(URL + ADD_STORE, request, Store.class);
-
+        //TODO assert the Response
         LOGGER.info("PosStoreApiApplicationTests: Created a new Store");
 
         Store myStore;
