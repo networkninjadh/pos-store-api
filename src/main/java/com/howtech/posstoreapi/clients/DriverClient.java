@@ -6,8 +6,6 @@ import org.springframework.web.client.RestTemplate;
 
 import com.howtech.posstoreapi.DTOs.DriverDto;
 
-import java.util.List;
-
 @Component
 public class DriverClient {
 
@@ -21,20 +19,20 @@ public class DriverClient {
 
     public DriverDto getById(Long driverId) {
 
-        String DRIVER = "/driver-api/driver";
+        String DRIVER = URL + "/driver-api/driver/" + driverId;
 
         ResponseEntity<DriverDto> response = restTemplate
-                .getForEntity(URL + driverId, DriverDto.class);
+                .getForEntity(DRIVER, DriverDto.class);
 
         return response.getBody();
     }
 
     public DriverDto[] getAllDrivers() {
 
-        String DRIVERS = "/driver-api/drivers";
+        String DRIVERS = URL + "/driver-api/drivers";
 
         ResponseEntity<DriverDto[]> response = restTemplate
-                .getForEntity(URL, DriverDto[].class);
+                .getForEntity(DRIVERS, DriverDto[].class);
 
         return response.getBody();
     }

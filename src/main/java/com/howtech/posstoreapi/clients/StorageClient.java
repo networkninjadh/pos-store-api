@@ -1,6 +1,13 @@
 package com.howtech.posstoreapi.clients;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public class StorageClient {
@@ -11,7 +18,7 @@ public class StorageClient {
   String URL = "http://localhost:";
   
   public StorageClient(RestTemplate restTemplate) {
-    this.restTemmplate = restTemplate;
+    this.restTemplate = restTemplate;
     
     headers.add("Content-Type", "application/json");
   }
@@ -30,7 +37,7 @@ public class StorageClient {
        new HttpEntity<>(body, headers);
     
     ResponseEntity<String> response = restTemplate
-      .postForEntity(URL + UPLOAD, String.class);
+      .postForEntity(URL + UPLOAD, request, String.class);
     
     return response.getBody();
   }
@@ -39,26 +46,26 @@ public class StorageClient {
   
     headers.add("user-token", username);
     
-    String GET_URL = "/storage/store-profile/" + storeId;
+    String POST_URL = "/storage/store-profile/" + storeId;
     
-    HttpEntity<void> request = new HttpEntity<>(headers);
+    HttpEntity<String> request = new HttpEntity<>("", headers);
     
     ResponseEntity<String> response = restTemplate
-      .getForEntity(URL, request, String.class);
+      .postForEntity(URL + POST_URL, request, String.class);
     
     return response.getBody();
   }
   
-  public String deleteStoreLogo(Long storeId, username) {
+  public String deleteStoreLogo(Long storeId, String username) {
     
     headers.add("user-token", username);
     
     String DELETE = "/storage/store-profile/delete/" + storeId;
     
-    HttpEntity<void> request = new HttpEntity<>(headers);
+    HttpEntity<String> request = new HttpEntity<>("", headers);
     
     ResponseEntity<String> response = restTemplate
-      .delete(URL, request, String.class);
+      .postForEntity(URL + DELETE, request, String.class);
     
     return response.getBody();
   }
@@ -77,7 +84,7 @@ public class StorageClient {
        new HttpEntity<>(body, headers);
     
     ResponseEntity<String> response = restTemplate.
-      postForEntity(URL + UPLOAD, String.class);
+      postForEntity(URL + UPLOAD, request, String.class);
     
     return response.getBody();
   }
@@ -88,10 +95,12 @@ public class StorageClient {
     
     String GET_URL = "/storage/store-profile/" + storeId + "/inventory-item/" + inventoryId;
     
-    HttpEntity<void> request = new HttpEntity<>(headers);
+    HttpEntity<String> request = new HttpEntity<>("", headers);
     
     ResponseEntity<String> response = restTemplate
-      .getForEntity(URL, request, String.class);
+      .postForEntity(URL + GET_URL, request, String.class);
+
+    return response.getBody();
   }
   
 }

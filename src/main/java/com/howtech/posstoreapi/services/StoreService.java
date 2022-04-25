@@ -145,10 +145,10 @@ public class StoreService {
 		}
 	}
 
-	public Store addStoreHours(Long storeId, UserInfo userInfo, HoursDto hours) throws StoreNotFoundException {
+	public Store addStoreHours(Long storeId, String username, HoursDto hours) throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
-		if (myStore.getOwnerName().equals(userInfo.getUsername())) {
+		if (myStore.getOwnerName().equals(username)) {
 			HoursOfOperation storeHours = new HoursOfOperation(
 					LocalTime.of(hours.getMonOpenHour(), 0, 0, 0), LocalTime.of(hours.getTueOpenHour(), 0, 0, 0),
 					LocalTime.of(hours.getWedOpenHour(), 0, 0, 0),
@@ -185,9 +185,9 @@ public class StoreService {
 		}
 	}
 
-	public List<Store> getByOwnerName(UserInfo userInfo) {
+	public List<Store> getByOwnerName(String username) {
 		List<Store> stores = storeRepository.findAll();
-		Predicate<Store> byOwner = store -> store.getOwnerName().equals(userInfo.getUsername());
+		Predicate<Store> byOwner = store -> store.getOwnerName().equals(username);
 		return stores.stream().filter(byOwner)
 				.collect(Collectors.toList());
 	}
@@ -232,9 +232,9 @@ public class StoreService {
 		return customerNames;
 	}
 
-	public Set<Employee> getEmployees(UserInfo userInfo) {
+	public Set<Employee> getEmployees(String username) {
 		List<Store> stores = storeRepository.findAll();
-		Predicate<Store> byOwner = store -> store.getOwnerName().equals(userInfo.getUsername());
+		Predicate<Store> byOwner = store -> store.getOwnerName().equals(username);
 		List<Store> myStores = stores.stream().filter(byOwner).collect(Collectors.toList());
 		Set<Employee> myEmployees = new HashSet<>();
 		myStores.forEach(store -> {
@@ -246,9 +246,9 @@ public class StoreService {
 		return myEmployees;
 	}
 
-	public Set<Product> getInventory(UserInfo userInfo) {
+	public Set<Product> getInventory(String username) {
 		List<Store> stores = storeRepository.findAll();
-		Predicate<Store> byOwner = store -> store.getOwnerName().equals(userInfo.getUsername());
+		Predicate<Store> byOwner = store -> store.getOwnerName().equals(username);
 		List<Store> myStores = stores.stream().filter(byOwner).collect(Collectors.toList());
 		Set<Product> myInventory = new HashSet<>();
 		myStores.parallelStream().forEach(store -> {
@@ -257,9 +257,9 @@ public class StoreService {
 		return myInventory;
 	}
 
-	public Set<StoreOrder> getOrders(UserInfo userInfo) {
+	public Set<StoreOrder> getOrders(String username) {
 		List<Store> stores = storeRepository.findAll();
-		Predicate<Store> byOwner = store -> store.getOwnerName().equals(userInfo.getUsername());
+		Predicate<Store> byOwner = store -> store.getOwnerName().equals(username);
 		List<Store> myStores = stores.stream().filter(byOwner).collect(Collectors.toList());
 		Set<StoreOrder> orders = new HashSet<>();
 		myStores.forEach(store -> {
@@ -268,9 +268,9 @@ public class StoreService {
 		return orders;
 	}
 
-	public Set<CustomerDto> getCustomers(UserInfo userInfo) {
+	public Set<CustomerDto> getCustomers(String username) {
 		List<Store> stores = storeRepository.findAll();
-		Predicate<Store> byOwner = store -> store.getOwnerName().equals(userInfo.getUsername());
+		Predicate<Store> byOwner = store -> store.getOwnerName().equals(username);
 		Set<Store> myStores = stores.stream().filter(byOwner).collect(Collectors.toSet());
 		// TODO get all customers from all stores
 		return new HashSet<>();// TODO: finish
@@ -281,10 +281,10 @@ public class StoreService {
 		// build the dto objects based off customer
 	}
 
-	public String referAStore(Long refererId, Long referredId, UserInfo userInfo) throws StoreNotFoundException {
+	public String referAStore(Long refererId, Long referredId, String username) throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(refererId)
 				.orElseThrow(() -> new StoreNotFoundException(refererId));
-		if (myStore.getOwnerName().equals(userInfo.getUsername())) {
+		if (myStore.getOwnerName().equals(username)) {
 			// check to see if the other store has finished signing up first
 			Store referredStore = storeRepository.findById(referredId)
 					.orElseThrow(() -> new StoreNotFoundException(referredId));
@@ -295,13 +295,13 @@ public class StoreService {
 		} else {
 			throw new AccessDeniedException("You don't own this store so you cannot refer another store");
 		}
-		return "Congratulations " + userInfo.getUsername() + " you have successfully referred store " + referredId;
+		return "Congratulations " + username + " you have successfully referred store " + referredId;
 	}
 
-	public String openStore(Long storeId, UserInfo userInfo, Employee employee) throws StoreNotFoundException {
+	public String openStore(Long storeId, String username, Employee employee) throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
-		if (myStore.getOwnerName().equals(userInfo.getUsername())) {
+		if (myStore.getOwnerName().equals(username)) {
 			Set<Employee> storeEmployees = myStore.getEmployees();
 			Predicate<Employee> byId = storeEmployee -> storeEmployee.getEmployeeId().equals(employee.getEmployeeId());
 			Employee e = storeEmployees
@@ -316,27 +316,27 @@ public class StoreService {
 		} else {
 			throw new AccessDeniedException("You don't own this store so you don't have permission to open it");
 		}
-		return "Congratulations " + userInfo.getUsername() + " your store is now open for business!!!";
+		return "Congratulations " + username + " your store is now open for business!!!";
 	}
 
-	public String closeStore(Long storeId, UserInfo userInfo) throws StoreNotFoundException {
+	public String closeStore(Long storeId, String username) throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
 
-		if (validStoreOwner(myStore, userInfo)) {
+		if (validStoreOwner(myStore, username)) {
 			myStore.setOpenForDelivery(false);
 			storeRepository.save(myStore);
 		} else {
 			throw new AccessDeniedException("You don't own this store so you don't have permissions to access it");
 		}
-		return "Congratulations " + userInfo.getUsername() + " your store is now open for business!!!";
+		return "Congratulations " + username + " your store is now open for business!!!";
 	}
 
-	public Set<StoreOrder> getOrdersByStore(Long storeId, UserInfo userInfo) throws StoreNotFoundException {
+	public Set<StoreOrder> getOrdersByStore(Long storeId, String username) throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
 		Set<StoreOrder> orders;
-		if (validStoreOwner(myStore, userInfo)) {
+		if (validStoreOwner(myStore, username)) {
 			orders = myStore.getStoreOrders();
 		} else {
 			throw new AccessDeniedException("You don't own this store so you don't have permissions to access it");
@@ -344,17 +344,17 @@ public class StoreService {
 		return orders;
 	}
 
-	private boolean validStoreOwner(Store myStore, UserInfo userInfo) {
-		if (myStore.getOwnerName().equals(userInfo.getUsername()))
+	private boolean validStoreOwner(Store myStore, String username) {
+		if (myStore.getOwnerName().equals(username))
 			return true;
 		return false;
 	}
 
-	public Shipment fulfillOrder(Long storeId, Long orderId, Employee employee, UserInfo userInfo)
+	public Shipment fulfillOrder(Long storeId, Long orderId, Employee employee, String username)
 			throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
-		if (!myStore.getOwnerName().equals(userInfo.getUsername())) {
+		if (!myStore.getOwnerName().equals(username)) {
 			throw new AccessDeniedException("You do not have the auathority to access this resource");
 		}
 		Set<Employee> storeEmployees = myStore.getEmployees();
@@ -381,7 +381,7 @@ public class StoreService {
 		// charge the customer
 	}
 
-	public StoreOrder orderFrom(Long storeId, Long customerId, StoreOrder order, UserInfo userInfo)
+	public StoreOrder orderFrom(Long storeId, Long customerId, StoreOrder order, String username)
 			throws CustomerNotFoundException, StoreNotFoundException, QueueFullException {
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
@@ -397,7 +397,7 @@ public class StoreService {
 		// the amount of that inventory by the ammount requested
 	}
 
-	public Store addEmployee(Long storeId, Employee newEmployeeData, UserInfo userInfo)
+	public Store addEmployee(Long storeId, Employee newEmployeeData, String username)
 			throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
@@ -416,7 +416,8 @@ public class StoreService {
 		return storeRepository.save(myStore);
 	}
 
-	public Employee getEmployee(Long storeId, Long employeeId, UserInfo userInfo) throws StoreNotFoundException {
+	public Employee getEmployee(Long storeId, Long employeeId, String username) throws StoreNotFoundException {
+		// TODO verify username is a store owner in myStore
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
 		Set<Employee> employees = myStore.getEmployees();
@@ -425,8 +426,9 @@ public class StoreService {
 		return employee.iterator().next();
 	}
 
-	public Store changeEmployeeData(Long storeId, Long employeeId, Employee newEmployeeData, UserInfo userInfo)
+	public Store changeEmployeeData(Long storeId, Long employeeId, Employee newEmployeeData, String username)
 			throws StoreNotFoundException {
+			// TODO verify username is a store owner in myStore
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
 		Set<Employee> employees = myStore.getEmployees();
@@ -445,13 +447,13 @@ public class StoreService {
 		return storeRepository.save(myStore);
 	}
 
-	public Set<Employee> getEmployees(Long storeId, UserInfo userInfo) throws StoreNotFoundException {
+	public Set<Employee> getEmployees(Long storeId, String username) throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
 		return myStore.getEmployees();
 	}
 
-	public Store deleteEmployee(Long storeId, Long employeeId, UserInfo userInfo) throws StoreNotFoundException {
+	public Store deleteEmployee(Long storeId, Long employeeId, String username) throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
 		Set<Employee> employees = myStore.getEmployees();
@@ -465,7 +467,7 @@ public class StoreService {
 		return storeRepository.save(myStore);
 	}
 
-	public Store deleteEmployees(Long storeId, UserInfo userInfo) throws StoreNotFoundException {
+	public Store deleteEmployees(Long storeId, String username) throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
 
@@ -473,7 +475,7 @@ public class StoreService {
 		return storeRepository.save(myStore);
 	}
 
-	public Set<Product> addInventoryItem(Long storeId, Product product, UserInfo userInfo)
+	public Set<Product> addInventoryItem(Long storeId, Product product, String username)
 			throws StoreNotFoundException {
 		Product newProduct = new Product();
 		newProduct.setImageURL(product.getImageURL());
@@ -485,7 +487,7 @@ public class StoreService {
 		newProduct.setDescriptions(product.getDescriptions());
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
-		if (!myStore.getOwnerName().equals(userInfo.getUsername())) {
+		if (!myStore.getOwnerName().equals(username)) {
 			throw new AccessDeniedException("You do not have the authority to access this resource");
 		}
 		newProduct.setStore(myStore);
@@ -494,11 +496,11 @@ public class StoreService {
 		return myStore.getStoreInventory();
 	}
 
-	public Product getInventoryItem(Long storeId, Long inventoryId, UserInfo userInfo)
+	public Product getInventoryItem(Long storeId, Long inventoryId, String username)
 			throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
-		if (!myStore.getOwnerName().equals(userInfo.getUsername())) {
+		if (!myStore.getOwnerName().equals(username)) {
 			throw new AccessDeniedException("You do not have the authority to access this resource");
 		}
 		Set<Product> inventoryItems = myStore.getStoreInventory();
@@ -506,11 +508,11 @@ public class StoreService {
 		return inventoryItems.stream().filter(byId).collect(Collectors.toSet()).iterator().next();
 	}
 
-	public Store changeInventoryItem(Long storeId, Long inventoryId, Product product, UserInfo userInfo)
+	public Store changeInventoryItem(Long storeId, Long inventoryId, Product product, String username)
 			throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
-		if (!myStore.getOwnerName().equals(userInfo.getUsername())) {
+		if (!myStore.getOwnerName().equals(username)) {
 			throw new AccessDeniedException("You do not have the authority to access this resource");
 		}
 
@@ -534,20 +536,20 @@ public class StoreService {
 		return storeRepository.save(myStore);
 	}
 
-	public Set<Product> getInventory(Long storeId, UserInfo userInfo) throws StoreNotFoundException {
+	public Set<Product> getInventory(Long storeId, String username) throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
-		if (!myStore.getOwnerName().equals(userInfo.getUsername())) {
+		if (!myStore.getOwnerName().equals(username)) {
 			throw new AccessDeniedException("You do not have the authority to access this resource");
 		}
 		return myStore.getStoreInventory();
 	}
 
-	public String deleteInventoryItem(Long storeId, Long inventoryId, UserInfo userInfo)
+	public String deleteInventoryItem(Long storeId, Long inventoryId, String username)
 			throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
-		if (!myStore.getOwnerName().equals(userInfo.getUsername())) {
+		if (!myStore.getOwnerName().equals(username)) {
 			throw new AccessDeniedException("You do not have the authority to access this resource");
 		}
 
@@ -562,7 +564,7 @@ public class StoreService {
 		return "Item with store id " + storeId + " and inventory id " + inventoryId + " has been deleted";
 	}
 
-	public String deleteInventory(Long storeId, UserInfo userInfo) throws StoreNotFoundException {
+	public String deleteInventory(Long storeId, String username) throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
 		myStore.setStoreInventory(null);
@@ -670,12 +672,12 @@ public class StoreService {
 	 * }
 	 * }
 	 */
-	public String uploadStoreLogo(Long storeId, MultipartFile file, UserInfo userInfo)
+	public String uploadStoreLogo(Long storeId, MultipartFile file, String username)
 			throws StoreNotFoundException {
 		String link = ""; // this.amazonClient.uploadFile(file);
 		Store myStore = storeRepository.findById(storeId)
-				.orElseThrow(() -> new StoreNotFoundException(userInfo.getUsername()));
-		if (!authenticateStoreOwner(userInfo.getUsername(), myStore.getOwners())) {
+				.orElseThrow(() -> new StoreNotFoundException(username));
+		if (!authenticateStoreOwner(username, myStore.getOwners())) {
 			throw new AccessDeniedException("This is not your store");
 		}
 		// myStore.setStoreLogo(link);
@@ -691,21 +693,21 @@ public class StoreService {
 		}
 	}
 
-	public URL getStoreLogoUrl(Long storeId, UserInfo userInfo)
+	public URL getStoreLogoUrl(Long storeId, String username)
 			throws StoreNotFoundException, MalformedURLException {
 		Store myStore = storeRepository.findById(storeId)
-				.orElseThrow(() -> new StoreNotFoundException(userInfo.getUsername()));
-		if (!authenticateStoreOwner(userInfo.getUsername(), myStore.getOwners())) {
+				.orElseThrow(() -> new StoreNotFoundException(username));
+		if (!authenticateStoreOwner(username, myStore.getOwners())) {
 			throw new AccessDeniedException("This is not your store");
 		}
 		String link = myStore.getStoreLogo();
 		return new URL(link); // amazonClient.getFileUrl(link);
 	}
 
-	public String deleteStoreImg(Long storeId, String fileUrl, UserInfo userInfo) throws StoreNotFoundException {
+	public String deleteStoreImg(Long storeId, String fileUrl, String username) throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(storeId)
-				.orElseThrow(() -> new StoreNotFoundException(userInfo.getUsername()));
-		if (!authenticateStoreOwner(userInfo.getUsername(), myStore.getOwners())) {
+				.orElseThrow(() -> new StoreNotFoundException(username));
+		if (!authenticateStoreOwner(username, myStore.getOwners())) {
 			throw new AccessDeniedException("This is not your store");
 		}
 		myStore.setStoreLogo(null);
@@ -713,12 +715,12 @@ public class StoreService {
 		return "";
 	}
 
-	public String uploadInventoryPhoto(Long storeId, Long inventoryId, MultipartFile file, UserInfo userInfo)
+	public String uploadInventoryPhoto(Long storeId, Long inventoryId, MultipartFile file, String username)
 			throws StoreNotFoundException {
 		String link = ""; // this.amazonClient.uploadFile(file);
 		Store myStore = storeRepository.findById(storeId)
-				.orElseThrow(() -> new StoreNotFoundException(userInfo.getUsername()));
-		if (!authenticateStoreOwner(userInfo.getUsername(), myStore.getOwners())) {
+				.orElseThrow(() -> new StoreNotFoundException(username));
+		if (!authenticateStoreOwner(username, myStore.getOwners())) {
 			throw new AccessDeniedException("This is not your store");
 		}
 		Set<Product> myInventory = myStore.getStoreInventory();
@@ -734,11 +736,11 @@ public class StoreService {
 		return link;
 	}
 
-	public String getInventoryPhotoUrl(Long storeId, Long inventoryId, UserInfo userInfo)
+	public String getInventoryPhotoUrl(Long storeId, Long inventoryId, String username)
 			throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(storeId)
-				.orElseThrow(() -> new StoreNotFoundException(userInfo.getUsername()));
-		if (!authenticateStoreOwner(userInfo.getUsername(), myStore.getOwners())) {
+				.orElseThrow(() -> new StoreNotFoundException(username));
+		if (!authenticateStoreOwner(username, myStore.getOwners())) {
 			throw new AccessDeniedException("This is not your store");
 		}
 		Set<Product> myInventory = myStore.getStoreInventory();
@@ -753,11 +755,11 @@ public class StoreService {
 
 	}
 
-	public String deleteProductImg(Long storeId, Long inventoryId, String fileUrl, UserInfo userInfo)
+	public String deleteProductImg(Long storeId, Long inventoryId, String fileUrl, String username)
 			throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(storeId)
-				.orElseThrow(() -> new StoreNotFoundException(userInfo.getUsername()));
-		if (!authenticateStoreOwner(userInfo.getUsername(), myStore.getOwners())) {
+				.orElseThrow(() -> new StoreNotFoundException(username));
+		if (!authenticateStoreOwner(username, myStore.getOwners())) {
 			throw new AccessDeniedException("This is not your store");
 		}
 		Set<Product> myInventory = myStore.getStoreInventory();

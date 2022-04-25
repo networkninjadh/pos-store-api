@@ -11,9 +11,9 @@ import com.howtech.posstoreapi.services.StoreService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,40 +42,71 @@ public class StoreOwnerController {
         this.storeService = storeService;
     }
 
+    /**
+     * 
+     * @param username
+     * @return
+     */
     @GetMapping("/my-stores")
-    public List<Store> getStores(UserInfo userInfo) {
-        return storeService.getByOwnerName(userInfo);
+    public List<Store> getStores(@RequestHeader(name = "user-token") String username) {
+        return storeService.getByOwnerName(username);
     }
 
+    /**
+     * 
+     * @param username
+     * @return
+     */
     @GetMapping("/my-employees")
-    public Set<Employee> getEmployees(UserInfo userInfo) {
-        return storeService.getEmployees(userInfo);
+    public Set<Employee> getEmployees(@RequestHeader(name = "user-token") String username) {
+        return storeService.getEmployees(username);
     }
 
+    /**
+     * @param username the username from pos-auth-api
+     */
     @GetMapping("/my-inventory")
-    public Set<Product> getInventory(UserInfo userInfo) {
-        return storeService.getInventory(userInfo);
+    public Set<Product> getInventory(@RequestHeader(name = "user-token") String username) {
+        return storeService.getInventory(username);
     }
 
+    /**
+     * 
+     * @param username
+     * @return
+     */
     @GetMapping("/my-orders")
-    public Set<StoreOrder> getOrders(UserInfo userInfo) {
-        return storeService.getOrders(userInfo);
+    public Set<StoreOrder> getOrders(@RequestHeader(name = "user-token") String username) {
+        return storeService.getOrders(username);
     }
 
+    /**
+     * 
+     * @param username
+     * @return
+     */
     @GetMapping("/my-customers")
-    public Set<CustomerDto> getCustomers(UserInfo userInfo) {
-        return storeService.getCustomers(userInfo);
+    public Set<CustomerDto> getCustomers(@RequestHeader(name = "user-token") String username) {
+        return storeService.getCustomers(username);
     }
 
+    /**
+     * 
+     * @param username
+     * @return
+     */
     @GetMapping("/my-drivers")
-    public Set<Driver> getDrivers(@AuthenticationPrincipal UserDetails userDetails) {
+    public Set<Driver> getDrivers(@RequestHeader(name = "user-token") String username) {
         // TODO get all drivers who have picked up from the store
         // TODO has to be done after writing driver controller
         return null;
     }
 
+    /**
+     * @param username the username from pos-auth-api
+     */
     @GetMapping("/my-shipments")
-    public Set<CustomerOrder> getShipments(@AuthenticationPrincipal UserDetails userDetails) {
+    public Set<CustomerOrder> getShipments(@RequestHeader(name = "user-token") String username) {
         return null; // TODO finish once the relay system for customers and orders is finished
     }
 }

@@ -19,20 +19,20 @@ public class CustomerClient {
 
     public CustomerDto getById(Long customerId) {
 
-        String CUSTOMER = "/customer-api/customer/";
+        String CUSTOMER = URL + "/customer-api/customer/" + customerId;
 
         ResponseEntity<CustomerDto> response = restTemplate
-                .getForEntity(URL + CUSTOMER + customerId, CustomerDto.class);
+                .getForEntity(CUSTOMER, CustomerDto.class);
 
         return response.getBody();
     }
 
     public CustomerDto[] getAllCustomers() {
 
-        String CUSTOMERS = "/customer-api/customers";
+        String CUSTOMERS = URL + "/customer-api/customers";
 
         ResponseEntity<CustomerDto[]> response = restTemplate
-                .getForEntity(URL, CustomerDto[].class);
+                .getForEntity(CUSTOMERS, CustomerDto[].class);
 
         return response.getBody();
     }

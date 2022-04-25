@@ -1,7 +1,6 @@
 package com.howtech.posstoreapi.controllers;
 
 import java.util.List;
-import java.util.Map;
 
 import com.howtech.posstoreapi.DTOs.HoursDto;
 import com.howtech.posstoreapi.DTOs.StoreDto;
@@ -36,26 +35,30 @@ public class StoreController {
 	/**
 	 * 
 	 * @param storeId  the store to set the hours for
-	 * @param hours    an object containing all the openening and closing hours
-	 *                 for a store including special holidays
-	 * @param userInfo
+	 * @param hours    an object containing all the openening and closing hours for a store including special holidays
+	 * @param username the username from pos-auth-api
 	 * @return the new store with the hours added
 	 * @throws StoreNotFoundException
 	 */
 	@PostMapping("/store/{store_id}/hours")
-	public Store addHours(@PathVariable(name = "store_id") Long storeId, @RequestBody HoursDto hours,
-			UserInfo userInfo) throws StoreNotFoundException {
-		return storeService.addStoreHours(storeId, userInfo, hours);
+	public Store addHours(@PathVariable(name = "store_id") Long storeId, 
+						  @RequestBody HoursDto hours,
+			              @RequestHeader(name = "user-token") String username
+						 ) throws StoreNotFoundException {
+		return storeService.addStoreHours(storeId, username, hours);
 	}
 
 	/**
 	 * 
 	 * @param store requestBody contains a Store object as JSON
+	 * @poaram username the username from pos-auth-api
 	 * @return the store object if it is persisted to the database
 	 * @throws Exception
 	 */
 	@PostMapping("/store/new")
-	public Store addStore(@RequestBody StoreDto store, @RequestHeader(name = "user-token", required = true) String username) {
+	public Store addStore(@RequestBody StoreDto store, 
+						  @RequestHeader(name = "user-token", required = true) String username
+						 ) {
 		LOGGER.info("Creating a new Store for user " + username);
 		return storeService.createFromDto(store, username);
 	}
@@ -69,10 +72,10 @@ public class StoreController {
 	 */
 	@PostMapping("/store/{store_id}/open")
 	public String openStore(@PathVariable(name = "store_id") Long storeId,
-			UserInfo userInfo,
-			@RequestBody Employee employee)
-			throws StoreNotFoundException {
-		return storeService.openStore(storeId, userInfo, employee);
+							@RequestHeader(name = "user-token") String username,
+							@RequestBody Employee employee)
+							throws StoreNotFoundException {
+		return storeService.openStore(storeId, username, employee);
 	}
 
 	/**
@@ -84,28 +87,29 @@ public class StoreController {
 	 */
 	@PostMapping("/store/{store_id}/close")
 	public String closeStore(@PathVariable(name = "store_id") Long storeId,
-			UserInfo userInfo) throws StoreNotFoundException {
-		return storeService.closeStore(storeId, userInfo);
+							 @RequestHeader(name = "user-token") String username
+							) throws StoreNotFoundException {
+		return storeService.closeStore(storeId, username);
 	}
 
 	/**
 	 * 
 	 * @param storeId1 the logged in store that is refering another store
 	 * @param storeId2 the store that is being refered
-	 * @param userInfo Auth Token
+	 * @param username Auth Token from pos-auth-api
 	 * @return a string value stating that the refereal was successful
 	 * @throws StoreNotFoundException
 	 */
 	@PostMapping("/store/{store_id_1}/refers/store/{store_id_2}")
 	public String referAStore(@PathVariable(name = "store_id_1") Long storeId1,
-			@PathVariable(name = "store_id_2") Long storeId2,
-			UserInfo userInfo) throws StoreNotFoundException {
-		return storeService.referAStore(storeId1, storeId2, userInfo);
+							  @PathVariable(name = "store_id_2") Long storeId2,
+							  @RequestHeader(name = "user-token") String username
+							 ) throws StoreNotFoundException {
+		return storeService.referAStore(storeId1, storeId2, username);
 
 	}
 
 	/**
-	 * 0
 	 * 
 	 * @param storeId
 	 * @param userInfo
