@@ -2,11 +2,11 @@ package com.howtech.posstoreapi.controllers;
 
 import java.util.Set;
 
-import com.howtech.posstoreapi.DTOs.UserInfo;
 import com.howtech.posstoreapi.exceptions.StoreNotFoundException;
 import com.howtech.posstoreapi.models.store.Product;
 import com.howtech.posstoreapi.models.store.Store;
 import com.howtech.posstoreapi.services.StoreService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +63,7 @@ public class InventoryController {
      * @throws StoreNotFoundException if No store with ID storeId is found in the database
      */
     @GetMapping("/store/{store_id}/inventory/{inventory_id}")
-    public Product getIventoryItem(@PathVariable(name = "store_id") Long storeId,
+    public Product getInventoryItem(@PathVariable(name = "store_id") Long storeId,
                                    @PathVariable(name = "inventory_id") Long inventoryId, 
                                    @RequestHeader(name = "user-token") String username)
             throws StoreNotFoundException {

@@ -1,5 +1,6 @@
 package com.howtech.posstoreapi.clients;
 
+
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,6 @@ public class StorageClient {
   
   public StorageClient(RestTemplate restTemplate) {
     this.restTemplate = restTemplate;
-    
     headers.add("Content-Type", "application/json");
   }
   
@@ -27,18 +27,18 @@ public class StorageClient {
     
     headers.add("user-token", username);
     
-    String UPLOAD = "/storage/store-profile/" + storeId;
-    
+    String UPLOAD = URL + "/storage/store-profile/" + storeId;
+
     MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-    
+
     body.add("file", file);
-    
+
     HttpEntity<MultiValueMap<String, Object>> request  =
        new HttpEntity<>(body, headers);
-    
+
     ResponseEntity<String> response = restTemplate
-      .postForEntity(URL + UPLOAD, request, String.class);
-    
+      .postForEntity(UPLOAD, request, String.class);
+
     return response.getBody();
   }
   
@@ -46,59 +46,59 @@ public class StorageClient {
   
     headers.add("user-token", username);
     
-    String POST_URL = "/storage/store-profile/" + storeId;
+    String GET_URL = URL + "/storage/store-profile/" + storeId;
     
     HttpEntity<String> request = new HttpEntity<>("", headers);
     
     ResponseEntity<String> response = restTemplate
-      .postForEntity(URL + POST_URL, request, String.class);
+      .postForEntity(GET_URL, request, String.class);
     
     return response.getBody();
   }
   
   public String deleteStoreLogo(Long storeId, String username) {
     
-    headers.add("user-token", username);
+    //headers.add("user-token", username);
     
-    String DELETE = "/storage/store-profile/delete/" + storeId;
+    String DELETE = URL + "/storage/store-profile/delete/" + storeId;
     
-    HttpEntity<String> request = new HttpEntity<>("", headers);
+    //HttpEntity<String> request = new HttpEntity<>("", headers);
     
-    ResponseEntity<String> response = restTemplate
-      .postForEntity(URL + DELETE, request, String.class);
-    
-    return response.getBody();
+    restTemplate
+            .delete(DELETE);
+
+    return "Store logo for Store with ID " + storeId + " has been deleted";
   }
   
   public String uploadInventoryPhoto(Long storeId, Long inventoryId, MultipartFile file, String username) {
   
     headers.add("user-token", username);
     
-    String UPLOAD = "/storage/store-profile/" + storeId + "/inventory-item/" + inventoryId;
-    
+    String UPLOAD = URL + "/storage/store-profile/" + storeId + "/inventory-item/" + inventoryId;
+
     MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-    
+
     body.add("file", file);
-    
-    HttpEntity<MultiValueMap<String, Object>> request = 
+
+    HttpEntity<MultiValueMap<String, Object>> request =
        new HttpEntity<>(body, headers);
-    
+
     ResponseEntity<String> response = restTemplate.
-      postForEntity(URL + UPLOAD, request, String.class);
-    
+      postForEntity(UPLOAD, request, String.class);
+
     return response.getBody();
   }
-  
+
   public String getInventoryPhotoUrl(Long storeId, Long inventoryId, String username) {
     
     headers.add("user-token", username);
     
-    String GET_URL = "/storage/store-profile/" + storeId + "/inventory-item/" + inventoryId;
+    String GET_URL = URL + "/storage/store-profile/" + storeId + "/inventory-item/" + inventoryId;
     
     HttpEntity<String> request = new HttpEntity<>("", headers);
     
     ResponseEntity<String> response = restTemplate
-      .postForEntity(URL + GET_URL, request, String.class);
+      .postForEntity(GET_URL, request, String.class);
 
     return response.getBody();
   }
