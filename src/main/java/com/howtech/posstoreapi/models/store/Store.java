@@ -79,8 +79,8 @@ public class Store {
 	private LocalDate nextBillingDate;
 	@Column(name = "last_billing_date")
 	private LocalDate lastBillingDate;
-	@Column(name = "number_of_referals")
-	private int referals;
+	@Column(name = "number_of_referrals")
+	private int referrals;
 	@Column(name = "number_of_transactions")
 	private int transactions;
 	@OneToOne(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
@@ -193,8 +193,6 @@ public class Store {
 		if (storeHours == null) {
 			if (this.storeHours != null) {
 				this.storeHours.setStore(this);
-			} else {
-				this.storeHours = storeHours;
 			}
 		}
 		this.storeHours = storeHours;
@@ -226,7 +224,7 @@ public class Store {
 		this.accountInfo = accountInfo;
 	}
 
-	public void addReferal() {
-		this.referals++;
+	public void addReferral() {
+		this.referrals++;
 	}
 }

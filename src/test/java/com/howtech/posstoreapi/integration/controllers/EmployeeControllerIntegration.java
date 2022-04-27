@@ -1,4 +1,4 @@
 package com.howtech.posstoreapi.integration.controllers;
 
-public class EmployeeControllerIntegration {
+public class       EmployeeControllerIntegration {
 }

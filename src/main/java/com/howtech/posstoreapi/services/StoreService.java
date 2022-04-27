@@ -1,6 +1,5 @@
 package com.howtech.posstoreapi.services;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
@@ -12,10 +11,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.howtech.posstoreapi.DTOs.CustomerDto;
 import com.howtech.posstoreapi.DTOs.HoursDto;
 import com.howtech.posstoreapi.DTOs.StoreDto;
@@ -38,12 +33,9 @@ import com.howtech.posstoreapi.repositories.StoreRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.expression.ParseException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.view.RedirectView;
 
 /**
  * 
@@ -289,7 +281,7 @@ public class StoreService {
 			Store referredStore = storeRepository.findById(referredId)
 					.orElseThrow(() -> new StoreNotFoundException(referredId));
 			if (referredStore.getMembershipType() != null) {
-				myStore.addReferal(); // can be modified later to keep track of the store that was referred
+				myStore.addReferral(); // can be modified later to keep track of the store that was referred
 				storeRepository.save(myStore);
 			}
 		} else {
