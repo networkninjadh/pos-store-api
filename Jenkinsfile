@@ -8,6 +8,7 @@ pipeline {
             steps {
                 echo "PATH = ${PATH}"
             }
+
         }
 
         stage('Build') {
@@ -15,6 +16,7 @@ pipeline {
                 echo "Build Stage"
                 sh 'mvn -D maven.test.failure.ignore=true install'
             }
+
         }
 
         stage('Test') {
@@ -28,18 +30,13 @@ pipeline {
               }
         }
 
-   stage ('Package') {
+        stage('package') {
             steps {
                 sh 'mvn clean package'
                 sh 'docker build -t pos-store-api .'
-                sh 'docker run --network="host" -p8085:8085 pos-store-api'
+                sh 'docker run --network="host" -d -p8085:8085 pos-store-api'
             }
         }
 
-        stage('Deploy') {
-            steps {
-
-            }
-        }
     }
 }
