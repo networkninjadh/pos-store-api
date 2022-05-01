@@ -33,7 +33,9 @@ pipeline {
         stage('package') {
             steps {
                 sh 'mvn clean package'
-                sh 'docker build -t pos-store-api .'
+                sh 'docker build -t networkninjadh/pos-store-api .'
+                sh 'docker login'
+                sh 'docker push networkninjadh/pos-store-api:latest'
                 sh 'docker run --network="host" -d -p8085:8085 pos-store-api'
             }
         }
