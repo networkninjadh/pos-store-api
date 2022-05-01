@@ -2,6 +2,9 @@ pipeline {
 
     agent any
 
+    environment {
+        dockerhub=credentials('dockerhub')
+    }
     stages {
 
         stage('Initialize') {
@@ -34,9 +37,8 @@ pipeline {
             steps {
                 sh 'mvn clean package'
                 sh 'docker build -t networkninjadh/pos-store-api .'
-                sh 'docker login'
+                sh 'echo $dockerhub_PSW | docker login -u $dockerhub_USR --password-stdin'
                 sh 'docker push networkninjadh/pos-store-api:latest'
-                sh 'docker run --network="host" -d -p8085:8085 pos-store-api'
             }
         }
 
