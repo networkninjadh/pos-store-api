@@ -131,6 +131,12 @@ class StoreControllerIntegration {
     }
 
     @Test
+    @DisplayName("Upload Store Logo to S3")
+    public void uploadStoreLogo() {
+
+    }
+
+    @Test
     public void addEmployee() {
 
     }
