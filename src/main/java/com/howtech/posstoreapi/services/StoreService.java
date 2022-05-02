@@ -1,20 +1,17 @@
 package com.howtech.posstoreapi.services;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.howtech.posstoreapi.DTOs.CustomerDto;
 import com.howtech.posstoreapi.DTOs.HoursDto;
 import com.howtech.posstoreapi.DTOs.StoreDto;
-import com.howtech.posstoreapi.DTOs.UserInfo;
 import com.howtech.posstoreapi.exceptions.CustomerNotFoundException;
 import com.howtech.posstoreapi.exceptions.QueueFullException;
 import com.howtech.posstoreapi.exceptions.StoreNotFoundException;
@@ -184,7 +181,8 @@ public class StoreService {
 				.collect(Collectors.toList());
 	}
 
-	public Store getById(Long storeId) throws StoreNotFoundException {
+	public Store getById(Long storeId, String username) throws StoreNotFoundException {
+		//Authorizes this method
 		return storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(storeId));
 	}
@@ -193,18 +191,18 @@ public class StoreService {
 		return storeRepository.findAll();
 	}
 
-	public String delete(Long storeId) {
+	public String delete(Long storeId, String username) {
 		storeRepository.deleteById(storeId);
 		return "Store with id " + storeId + " has been deleted";
 	}
 
-	public String deleteStores() {
+	public String deleteStores(String username) {
 		storeRepository.deleteAll();
 		return "All stores have been deleted";
 	}
 
-	public List<String> getCustomerList(Long storeId, UserInfo userInfo) {
-		Predicate<Store> byOwner = store -> store.getOwnerName().equals(userInfo.getUsername());
+	public List<String> getCustomerList(Long storeId, String username) {
+		Predicate<Store> byOwner = store -> store.getOwnerName().equals(username);
 		List<Store> myStores = storeRepository
 				.findAll()
 				.parallelStream()
@@ -337,9 +335,7 @@ public class StoreService {
 	}
 
 	private boolean validStoreOwner(Store myStore, String username) {
-		if (myStore.getOwnerName().equals(username))
-			return true;
-		return false;
+		return myStore.getOwnerName().equals(username);
 	}
 
 	public Shipment fulfillOrder(Long storeId, Long orderId, Employee employee, String username)
@@ -564,132 +560,28 @@ public class StoreService {
 		return "All of store " + storeId + "'s inventory has been deleted";
 	}
 
-	/*
-	 * public RedirectView connectToPaypal(Long storeId, HttpSession session,
-	 * UserInfo)
-	 * throws StoreNotFoundException, PayPalRESTException {
-	 * Store myStore = storeRepository.findById(storeId)
-	 * .orElseThrow(() -> new StoreNotFoundException(storeId));
-	 * if (myStore.getOwnerName().equals(userInfo.getUsername())) {
-	 * return paypalService.connectPaypal(session, storeId);
-	 * } else {
-	 * throw new AccessDeniedException(
-	 * "You don't own this store so you don't have permission to connect to paypal"
-	 * );
-	 * }
-	 * }
-	 */
-	/**
-	 * public String paypalAuthRedirect(String authCode, HttpSession session,
-	 * UserInfo userInfo)
-	 * throws PayPalRESTException {
-	 * paypalService.authorizeconnection(authCode, session);
-	 * return "Success";
-	 * }
-	 * 
-	 * public void sendPaypalToStore(Long storeId, ChargeDto charge, UserInfo
-	 * userInfo) throws IOException {
-	 * paypalService.createPaypalPayout(charge.getAmount(), charge.getOrderId(),
-	 * storeId);
-	 * }
-	 **/
-	/**
-	 * public RedirectView connectToQuickbooks(Long storeId, HttpSession session,
-	 * UserInfo userInfo)
-	 * throws StoreNotFoundException {
-	 * Store myStore = storeRepository.findById(storeId)
-	 * .orElseThrow(() -> new StoreNotFoundException(storeId));
-	 * if (myStore.getOwnerName().equals(userInfo.getUsername())) {
-	 * return qboService.connectToQuickbooks(session, storeId);
-	 * } else {
-	 * throw new AccessDeniedException(
-	 * "You don't own this store so you don't have permission to connect to
-	 * quickbooks");
-	 * }
-	 * }
-	 * 
-	 * 
-	 * public String callBackFromOAuth(String authCode, String state, String
-	 * realmId, HttpSession session,
-	 * UserInfo userInfo) {
-	 * return qboService.callBackFromOAuth(authCode, state, realmId, session);
-	 * }
-	 * 
-	 * public String callQboVendorCreate(Long storeId, HttpSession session,
-	 * CompanyDto company, UserInfo userInfo)
-	 * throws JsonProcessingException, FMSException, ParseException,
-	 * java.text.ParseException {
-	 * return qboService.createQboVendor(storeId, company);
-	 * }
-	 * 
-	 * public String callBillingConcept(Long storeId, HttpSession session, ChargeDto
-	 * chargedto, UserInfo userInfo)
-	 * throws FMSException, ParseException, java.text.ParseException {
-	 * return qboService.callBillingConcept(storeId, chargedto.getAmount());
-	 * }
-	 * 
-	 * public ResponseEntity<String> chargeStoreBankAccount(Long storeId, ChargeDto
-	 * stripeCharge,
-	 * UserInfo userInfo) {
-	 * return paymentService.createPaymentwithDefaultSource(storeId, stripeCharge);
-	 * }
-	 * 
-	 * public void createStoreBillingAccount(Long storeId, PayerDto acc, UserInfo
-	 * userInfo) throws StripeException {
-	 * Customer customer = paymentService.createPayer(storeId, acc);
-	 * StripeBank stripeBank = paymentService.createBillingBankAccount(storeId);
-	 * paymentService.createStripeCustomerBankAccount(stripeBank.getBankId(), acc);
-	 * paymentService.validateStripeBankAccount(stripeBank.getBankId());
-	 * }
-	 * 
-	 * public void createStoreDepositAccount(Long storeId, CompanyDto acc,
-	 * HttpServletRequest request,
-	 * UserInfo userInfo) {
-	 * try {
-	 * paymentService.createVendorCompany(acc, request.getRemoteAddr(), storeId);
-	 * paymentService.createVendorCompanyBankAccount(storeId, acc);
-	 * 
-	 * } catch (Exception e) {
-	 * e.printStackTrace();
-	 * }
-	 * }
-	 * 
-	 * public void payStoreDepositAccount(Long storeId, ChargeDto c,
-	 * HttpServletRequest request, UserInfo userInfo) {
-	 * try {
-	 * paymentService.stripeDepositToBank(c.getAmount(), storeId,
-	 * "py_1HXH3fDNHKH66w8gMT9OzMvi");
-	 * } catch (Exception e) {
-	 * e.printStackTrace();
-	 * }
-	 * }
-	 */
 	public String uploadStoreLogo(Long storeId, MultipartFile file, String username)
-			throws StoreNotFoundException {
-		String link = ""; // this.amazonClient.uploadFile(file);
+			throws StoreNotFoundException, IOException {
+		String link = storageService.uploadStoreLogo(storeId, file, username);
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(username));
-		if (!authenticateStoreOwner(username, myStore.getOwners())) {
+		if (authenticateStoreOwner(username, myStore.getOwners())) {
 			throw new AccessDeniedException("This is not your store");
 		}
-		// myStore.setStoreLogo(link);
+		myStore.setStoreLogo(link);
 		storeRepository.save(myStore);
 		return link;
 	}
 
 	private boolean authenticateStoreOwner(String username, List<String> owners) {
-		if (owners.contains(username)) {
-			return true;
-		} else {
-			return false;
-		}
+		return !owners.contains(username);
 	}
 
 	public URL getStoreLogoUrl(Long storeId, String username)
 			throws StoreNotFoundException, MalformedURLException {
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(username));
-		if (!authenticateStoreOwner(username, myStore.getOwners())) {
+		if (authenticateStoreOwner(username, myStore.getOwners())) {
 			throw new AccessDeniedException("This is not your store");
 		}
 		String link = myStore.getStoreLogo();
@@ -699,7 +591,7 @@ public class StoreService {
 	public String deleteStoreImg(Long storeId, String fileUrl, String username) throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(username));
-		if (!authenticateStoreOwner(username, myStore.getOwners())) {
+		if (authenticateStoreOwner(username, myStore.getOwners())) {
 			throw new AccessDeniedException("This is not your store");
 		}
 		myStore.setStoreLogo(null);
@@ -712,12 +604,12 @@ public class StoreService {
 		String link = ""; // this.amazonClient.uploadFile(file);
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(username));
-		if (!authenticateStoreOwner(username, myStore.getOwners())) {
+		if (authenticateStoreOwner(username, myStore.getOwners())) {
 			throw new AccessDeniedException("This is not your store");
 		}
 		Set<Product> myInventory = myStore.getStoreInventory();
 		myInventory
-				.stream()
+				.parallelStream()
 				.forEach((inventoryItem) -> {
 					if (inventoryId == inventoryItem.getProductId()) {
 						inventoryItem.setImageURL(link);
@@ -732,7 +624,7 @@ public class StoreService {
 			throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(username));
-		if (!authenticateStoreOwner(username, myStore.getOwners())) {
+		if (authenticateStoreOwner(username, myStore.getOwners())) {
 			throw new AccessDeniedException("This is not your store");
 		}
 		Set<Product> myInventory = myStore.getStoreInventory();
@@ -751,14 +643,14 @@ public class StoreService {
 			throws StoreNotFoundException {
 		Store myStore = storeRepository.findById(storeId)
 				.orElseThrow(() -> new StoreNotFoundException(username));
-		if (!authenticateStoreOwner(username, myStore.getOwners())) {
+		if (authenticateStoreOwner(username, myStore.getOwners())) {
 			throw new AccessDeniedException("This is not your store");
 		}
 		Set<Product> myInventory = myStore.getStoreInventory();
 		myInventory
-				.stream()
+				.parallelStream()
 				.forEach((inventoryItem) -> {
-					if (inventoryId == inventoryItem.getProductId()) {
+					if (Objects.equals(inventoryId, inventoryItem.getProductId())) {
 						inventoryItem.setImageURL(null);
 					}
 				});

@@ -1,8 +1,11 @@
 package com.howtech.posstoreapi.clients;
 
 
+import com.howtech.posstoreapi.services.util.Files;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -10,34 +13,48 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+
 @Component
 public class StorageClient {
 
   private final RestTemplate restTemplate;
   private final HttpHeaders headers = new HttpHeaders();
   
-  String URL = "http://localhost:";
+  String URL = "http://localhost:8090";
   
   public StorageClient(RestTemplate restTemplate) {
     this.restTemplate = restTemplate;
     headers.add("Content-Type", "application/json");
   }
   
-  public String uploadStoreLogo(Long storeId, MultipartFile file, String username) {
-    
+  public String uploadStoreLogo(Long storeId, MultipartFile file, String username) throws IOException {
+
     headers.add("user-token", username);
-    
-    String UPLOAD = URL + "/storage/store-profile/" + storeId;
+    headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+    String UPLOAD = URL + "/storage/store-profile/";
 
     MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
-    body.add("file", file);
+    File myFile = Files.convertMultiPartToFile(file);
+
+    ByteArrayResource fileAsResource = new
+            ByteArrayResource(file.getBytes()) {
+              @Override
+              public String getFilename() {
+                return file.getOriginalFilename();
+              }
+            };
+
+    body.add("file", fileAsResource);
 
     HttpEntity<MultiValueMap<String, Object>> request  =
        new HttpEntity<>(body, headers);
 
     ResponseEntity<String> response = restTemplate
-      .postForEntity(UPLOAD, request, String.class);
+      .postForEntity(UPLOAD + storeId, request, String.class);
 
     return response.getBody();
   }
@@ -102,5 +119,4 @@ public class StorageClient {
 
     return response.getBody();
   }
-  
 }
