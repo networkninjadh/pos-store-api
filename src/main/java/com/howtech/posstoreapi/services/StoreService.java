@@ -196,9 +196,8 @@ public class StoreService {
 		return "Store with id " + storeId + " has been deleted";
 	}
 
-	public String deleteStores(String username) {
+	public void deleteStores(String username) {
 		storeRepository.deleteAll();
-		return "All stores have been deleted";
 	}
 
 	public List<String> getCustomerList(Long storeId, String username) {
